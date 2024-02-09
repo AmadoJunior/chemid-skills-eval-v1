@@ -10,12 +10,10 @@ const app = express()
 app.use(express.json())
 
 //Routes
-const upload = require("./routes/upload.js");
-app.use("/api/upload", upload)
-
-app.get("/", (req, res) => {
-	res.status(200).send("OK")
-})
+const uploadsRouter = require("./routes/uploads.js");
+app.use("/api/uploads", uploadsRouter)
+const parserRouter = require("./routes/parser.js");
+app.use("/api/parser", parserRouter)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
