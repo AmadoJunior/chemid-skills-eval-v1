@@ -5,7 +5,7 @@ const eslint = require('vite-plugin-eslint')
 
 module.exports = defineConfig({
 	server: {
-		port: 8081
+		port: 3000
 	},
 	plugins: [
 		react(),
