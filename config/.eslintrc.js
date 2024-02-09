@@ -9,11 +9,7 @@ module.exports = {
 		browser: true,
 		es2022: true
 	},
-	plugins: [
-		'react',
-		'jsx-a11y',
-		'import'
-	],
+	plugins: ['react', 'jsx-a11y', 'import'],
 	extends: ['eslint-config-airbnb'],
 	rules: {
 		'react/react-in-jsx-scope': 0,
@@ -21,7 +17,11 @@ module.exports = {
 		'react/destructuring-assignment': 0,
 		'react/forbid-prop-types': 0,
 		'react/jsx-props-no-multi-spaces': 0,
-		'react/jsx-indent': [2, 'tab', { checkAttributes: true, indentLogicalExpressions: true }],
+		'react/jsx-indent': [
+			2,
+			'tab',
+			{ checkAttributes: true, indentLogicalExpressions: true }
+		],
 		'react/jsx-indent-props': [2, 'tab'],
 		'jsx-quotes': [2, 'prefer-single'],
 		// ---------------------
@@ -46,5 +46,6 @@ module.exports = {
 		'prefer-const': 2,
 		'no-var': 2,
 		'object-curly-newline': [2, { consistent: true }],
+		'import/no-extraneous-dependencies': ['error', { devDependencies: true }]
 	}
 }
