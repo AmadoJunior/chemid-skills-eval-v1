@@ -42,7 +42,7 @@ Sections
 */
 
 body {
-	margin: 0;
+	margin: 20px;
 	/* Remove the margin in all browsers. */
 }
 
@@ -143,12 +143,18 @@ Tabular data
 1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
 2. Correct table border color inheritance in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
 */
-
 table {
 	text-indent: 0;
 	/* 1 */
 	border-color: inherit;
 	/* 2 */
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
 }
 
 /*
