@@ -5,7 +5,14 @@ const eslint = require('vite-plugin-eslint')
 
 module.exports = defineConfig({
 	server: {
-		port: 3000
+		port: 3000,
+		proxy: {
+			'/api': {
+				target: 'http://localhost:5000',
+				changeOrigin: true,
+				secure: false
+			}
+		}
 	},
 	plugins: [
 		react(),
