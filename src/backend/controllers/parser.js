@@ -10,7 +10,7 @@ const VOLUME_KEY = "volume"
 const getFileDetails = async (req, res) => {
   const { fileKey } = req.params
   const { requireDensity } = req.query
-  console.log(requireDensity)
+  
   if(!fileKey) return res.status(400).json({error: "File URL Not Found"})
 
   try {
