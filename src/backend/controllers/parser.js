@@ -1,6 +1,6 @@
 //Services
 const { getFileStream } = require("../services/uploads")
-const { getParsedStream, computeDensityStream } = require("./../services/parser")
+const { parsingStream, computeDensityStream } = require("./../services/parser")
 
 //Config
 const MASS_KEY = "mass"
@@ -14,12 +14,10 @@ const getFileDetails = async (req, res) => {
   if(!fileKey) return res.status(400).json({error: "File URL Not Found"})
 
   try {
-    const fileStream = await getFileStream(fileKey)
-
-    let parsedStream = getParsedStream(fileStream)
+    let parsedStream = await getFileStream(fileKey).pipe(parsingStream())
+    
     if (requireDensity === 'true') {
-      const myComputeDensityStream = computeDensityStream(MASS_KEY, VOLUME_KEY)
-      parsedStream = parsedStream.pipe(myComputeDensityStream)
+      parsedStream = parsedStream.pipe(computeDensityStream(MASS_KEY, VOLUME_KEY))
     }
     
     // Acc Objects

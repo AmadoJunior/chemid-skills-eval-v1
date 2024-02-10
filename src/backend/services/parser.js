@@ -29,12 +29,11 @@ const computeDensityStream = (massKey, volumeKey) => new Transform({
   }
 })
 
-const getParsedStream = (fileStream) => {
-    return fileStream
-      .pipe(fastCsv.parse({ headers: (headers) => headers.map(header => header.toLowerCase()) }))
+const parsingStream = () => {
+    return fastCsv.parse({ headers: (headers) => headers.map(header => header.toLowerCase()) })
 }
 
 module.exports = {
-  getParsedStream,
+  parsingStream,
   computeDensityStream
 }
