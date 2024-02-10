@@ -1,6 +1,6 @@
 //Services
 const { getFileStream } = require("../services/uploads")
-const { getParsedStream, computeDensityStream, getJSONStream } = require("./../services/parser")
+const { getParsedStream, computeDensityStream } = require("./../services/parser")
 
 //Config
 const MASS_KEY = "mass"
@@ -22,15 +22,20 @@ const getFileDetails = async (req, res) => {
       parsedStream = parsedStream.pipe(myComputeDensityStream)
     }
     
-    res.setHeader('Content-Type', 'application/json');
+    // Acc Objects
+    const objects = [];
+    parsedStream.on('data', (obj) => {
+      objects.push(obj)
+    })
 
-    const myJSONStream = getJSONStream()
-    parsedStream
-      .pipe(myJSONStream)
-      .pipe(res)
-      .on('error', (error) => {
-        console.error('Stream Error:', error);
-      });
+    parsedStream.on('error', (error) => {
+      console.error('Stream Error:', error)
+      res.status(500).json({ error: 'Error Processing Stream' })
+    })
+
+    parsedStream.on('end', () => {
+      res.status(200).json(objects)
+    })
   } catch(err){
     res.status(500).json({ error: 'Error Fetching File' })
   }
