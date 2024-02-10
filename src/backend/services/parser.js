@@ -1,4 +1,5 @@
 const fastCsv = require("fast-csv")
+const { Transform } = require("stream");
 
 //Helpers
 const parseValue = (str) => {
@@ -10,32 +11,53 @@ const isValidNumber = (n) => {
 }
 
 //Methods
-const parseStream = (fileStream) => {
-  return new Promise((resolve, reject) => {
-    let csvData = [];
-    fileStream.pipe(fastCsv.parse({ headers: (headers) => headers.map(header => header.toLowerCase()) }))
-    .on('error', (error) => reject(error))
-    .on('data', (row) => csvData.push(row))
-    .on('end', () => {
-      resolve(csvData)
-    })
-  })
-}
+const getJSONStream = () => new Transform({
+  writableObjectMode: true,
+  readableObjectMode: false,
+  construct(callback) {
+    this.isFirstObject = true;
+    callback();
+  },
+  transform(chunk, encoding, callback) {
+    if (this.isFirstObject) {
+      this.push('[' + JSON.stringify(chunk));
+      this.isFirstObject = false;
+    } else {
+      this.push(',' + JSON.stringify(chunk));
+    }
+    callback();
+  },
+  flush(callback) {
+    this.push(this.isFirstObject ? '[]' : ']');
+    callback();
+  }
+});
 
-const computeDensity = (parsedObject, massKey, volumeKey) => {
-  return parsedObject.map((obj) => {
-    const mass = parseValue(obj[massKey])
-    const volume = parseValue(obj[volumeKey])
+const computeDensityStream = (massKey, volumeKey) => new Transform({
+  objectMode: true,
+  transform(chunk, encoding, callback) {
+    const mass = parseValue(chunk[massKey]);
+    const volume = parseValue(chunk[volumeKey]);
+
     if (isValidNumber(mass) && isValidNumber(volume) && volume !== 0) {
       const density = mass / volume;
-      return { compound: obj.compound, density: density.toFixed(2) };
+      chunk.density = density.toFixed(2);
     } else {
-      return { compound: obj.compound, density: null };
+      chunk.density = null;
     }
-  })
+    
+    this.push(chunk);
+    callback();
+  }
+});
+
+const getParsedStream = (fileStream) => {
+    return fileStream
+      .pipe(fastCsv.parse({ headers: (headers) => headers.map(header => header.toLowerCase()) }))
 }
 
 module.exports = {
-  parseStream,
-  computeDensity
+  getParsedStream,
+  computeDensityStream,
+  getJSONStream
 }

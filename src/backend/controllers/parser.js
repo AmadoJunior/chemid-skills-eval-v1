@@ -1,6 +1,6 @@
 //Services
 const { getFileStream } = require("../services/uploads")
-const { parseStream, computeDensity } = require("./../services/parser")
+const { getParsedStream, computeDensityStream, getJSONStream } = require("./../services/parser")
 
 //Config
 const MASS_KEY = "mass"
@@ -10,18 +10,27 @@ const VOLUME_KEY = "volume"
 const getFileDetails = async (req, res) => {
   const { fileKey } = req.params
   const { requireDensity } = req.query
-
+  console.log(requireDensity)
   if(!fileKey) return res.status(400).json({error: "File URL Not Found"})
 
   try {
     const fileStream = await getFileStream(fileKey)
-    const parsedFile = await parseStream(fileStream)
 
-    const responseObj = { fileName: fileKey, fileBody: parsedFile }
+    let parsedStream = getParsedStream(fileStream)
+    if (requireDensity === 'true') {
+      const myComputeDensityStream = computeDensityStream(MASS_KEY, VOLUME_KEY)
+      parsedStream = parsedStream.pipe(myComputeDensityStream)
+    }
+    
+    res.setHeader('Content-Type', 'application/json');
 
-    if(requireDensity === "true") responseObj.computedValues = computeDensity(parsedFile, MASS_KEY, VOLUME_KEY)
-
-    res.status(200).json(responseObj)
+    const myJSONStream = getJSONStream()
+    parsedStream
+      .pipe(myJSONStream)
+      .pipe(res)
+      .on('error', (error) => {
+        console.error('Stream Error:', error);
+      });
   } catch(err){
     res.status(500).json({ error: 'Error Fetching File' })
   }
