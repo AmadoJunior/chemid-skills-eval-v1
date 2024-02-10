@@ -14,9 +14,12 @@ const getFileDetails = async (req, res) => {
   if(!fileKey) return res.status(400).json({error: "File URL Not Found"})
 
   try {
-    let parsedStream = await getFileStream(fileKey).pipe(parsingStream())
+    const fileStream = await getFileStream(fileKey)
     
+    //Parses CSV
+    let parsedStream = fileStream.pipe(parsingStream())
     if (requireDensity === 'true') {
+      //Adds Density
       parsedStream = parsedStream.pipe(computeDensityStream(MASS_KEY, VOLUME_KEY))
     }
     
