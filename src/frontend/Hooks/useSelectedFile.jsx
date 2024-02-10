@@ -12,7 +12,13 @@ export default function useSelectedFile(fileKey) {
 
 		axios.get(`api/parser/${fileKey}`, { params: { requireDensity: true } })
 			.then((response) => {
-				if (response?.data) setSelectedFile(response.data)
+				if (response?.data) {
+					setSelectedFile({
+						fileName: fileKey,
+						fileBody: response.data,
+						computedValues: response.data?.map(({ compound, density }) => ({ compound, density }))
+					})
+				}
 			})
 			.catch((err) => {
 				console.error(err)
